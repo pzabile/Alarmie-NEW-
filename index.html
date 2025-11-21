@@ -45,6 +45,20 @@
       }
     </script>
     <style>
+      /* iOS Native Feel Optimizations */
+      * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none; /* Prevent long press menu on images/links */
+        user-select: none;
+        -webkit-user-select: none; /* Prevent text selection */
+      }
+      
+      /* Allow selection in inputs */
+      input, textarea {
+        user-select: text;
+        -webkit-user-select: text;
+      }
+
       body {
         background-color: #050505;
         color: #ffffff;
@@ -58,7 +72,18 @@
           radial-gradient(circle at 50% 0%, #1a1a2e 0%, transparent 50%),
           radial-gradient(circle at 0% 50%, rgba(112, 0, 255, 0.1) 0%, transparent 30%),
           radial-gradient(circle at 100% 50%, rgba(0, 240, 255, 0.1) 0%, transparent 30%);
+        /* Prevent rubber banding on iOS */
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
       }
+      
+      /* Hide scrollbar for cleaner look */
+      ::-webkit-scrollbar {
+        display: none;
+      }
+
       .glass {
         background: rgba(18, 18, 18, 0.6);
         backdrop-filter: blur(12px);

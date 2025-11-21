@@ -49,10 +49,8 @@ export default function App() {
     audioService.current.onInterruption = () => {
         if (statusRef.current === AppStatus.ACTIVE) {
             console.log("Interruption detected (Possible iOS disconnect)");
-            // We try to resume immediately to see if we can. If it was a disconnect,
-            // we want to trigger alarm.
-            // On Web, we can't force resume without user gesture often, 
-            // but we can trigger the ALARM status to show the UI.
+            // On iOS WebView, unplugging headphones sets context to 'interrupted'.
+            // We interpret this as a disconnect event if we were ACTIVE.
             triggerAlarm();
         }
     };
@@ -97,11 +95,11 @@ export default function App() {
 
     // Detection Logic: If we were active, and output count dropped, trigger alarm
     // This covers desktop mostly. Mobile relies more on onInterruption.
-    if (status === AppStatus.ACTIVE && outputs.length < previousDeviceCount.current) {
+    if (statusRef.current === AppStatus.ACTIVE && outputs.length < previousDeviceCount.current) {
         triggerAlarm();
     }
     previousDeviceCount.current = outputs.length;
-  }, [status]);
+  }, []); // Removed dependency on 'status' to avoid stale closures, using ref instead
 
   const toggleActive = async () => {
     if (status === AppStatus.ACTIVE) {
@@ -119,9 +117,7 @@ export default function App() {
 
   const startMonitoring = () => {
     disconnectCheckInterval.current = window.setInterval(() => {
-        // Heartbeat check for audio context state
-        // If the OS suspended us in background, we might need to know
-        // But onInterruption usually catches it faster.
+        // Heartbeat check for audio context state could go here
     }, 5000);
   };
 
@@ -133,6 +129,7 @@ export default function App() {
   };
 
   const triggerAlarm = () => {
+    console.log("Triggering Alarm Sequence");
     setStatus(AppStatus.ALARMING);
     audioService.current.stopKeepAlive();
     // We attempt to start alarm. If context is suspended, startAlarm calls resume().

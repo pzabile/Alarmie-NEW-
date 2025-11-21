@@ -31,7 +31,7 @@ export class AudioService {
       // Listener for iOS interruptions (unplugging often suspends context)
       this.context.onstatechange = () => {
         // Cast to string to support non-standard 'interrupted' state on iOS
-        const state = this.context?.state as string;
+        const state = (this.context as any)?.state as string;
         
         // 'interrupted' is specific to iOS when audio route changes (unplugged)
         // 'suspended' can happen when backgrounded if MediaSession isn't working
@@ -56,8 +56,14 @@ export class AudioService {
 
   public async ensureContextActive(): Promise<void> {
     const ctx = this.getContext();
-    if (ctx.state === 'suspended' || (ctx.state as string) === 'interrupted') {
-      await ctx.resume();
+    const state = (ctx as any).state as string;
+    
+    if (state === 'suspended' || state === 'interrupted') {
+      try {
+        await ctx.resume();
+      } catch (e) {
+        console.warn('Could not resume audio context', e);
+      }
     }
   }
 
