@@ -1,0 +1,7 @@
+{
+  "name": "Alarmie Web",
+  "description": "A web-based utility to prevent external speakers from sleeping by playing ultra-low volume audio, featuring a disconnect alarm.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
